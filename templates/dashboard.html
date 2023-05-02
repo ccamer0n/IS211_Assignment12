@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+    <h1>Dashboard</h1>
+<body>
+    <table border = 1>
+        <tr>
+            <th>Student ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+        </tr>
+        {% for row in students %}
+        <tr>
+            {% for field in row %}
+            <td>{{ field }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table><br>
+    <table border = 1>
+        <tr>
+            <th>Quiz ID</th>
+            <th>Subject</th>
+            <th>Number of Questions</th>
+            <th>Quiz Date</th>
+        </tr>
+        {% for row in quizzes %}
+        <tr>
+            {% for field in row %}
+            <td>{{ field }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
