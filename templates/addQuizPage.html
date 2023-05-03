@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Quiz</title>
+</head>
+    <h1>Add Quiz</h1>
+<body>
+    <h2>{{ error }}</h2>
+    <form action = "/quizzes/add" method = "POST">
+        <h3>Add Quiz</h3>
+            Subject<br>
+            <input type = "text" name = "subject" /><br>
+            Number of Questions<br>
+            <input type = "text" name = "num_questions" /><br>
+            Date<br>
+            <input type = "date" id = "date" name = "date" /><br>
+            Submit<br>
+            <input type = "submit" value = "submit" /><br>
+    </form>
+</body>
+</html>

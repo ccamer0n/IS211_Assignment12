@@ -31,6 +31,45 @@ def dashboard():
 
     return render_template('dashboard.html', students=students, quizzes=quizzes)
 
+@app.route('/student')
+def student_form():
+    return render_template('addStudentPage.html')
+
+@app.route('/student/add', methods = ['POST'])
+def add_student():
+    try:
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        with sqlite3.connect('hw13.db') as con:
+            cur = con.cursor()
+            cur.execute("INSERT INTO Students (first_name, last_name) VALUES (?, ?)", (first_name, last_name))
+            con.commit()
+            return redirect('/dashboard')
+    except:
+        con.rollback()
+        error = "Error in insert operation"
+        return render_template('addStudentPage.html', error=error)
+
+@app.route('/quizzes')
+def quizzes_form():
+    return render_template('addQuizPage.html')
+
+@app.route('/quizzes/add', methods = ['POST'])
+def add_quizzes():
+    try:
+        subject = request.form['subject']
+        num_questions = request.form['num_questions']
+        date = request.form['date']
+        with sqlite3.connect('hw13.db') as con:
+            cur = con.cursor()
+            cur.execute("INSERT INTO Quizzes (subject, num_questions, date) VALUES (?, ?, ?)", (subject, num_questions, date))
+            con.commit()
+            return redirect('/dashboard')
+    except:
+        con.rollback()
+        error = "Error in insert operation"
+        return render_template('addQuizPage.html', error=error)
+
 def read_data():
     f = open('schema.sql', 'r')
     with f:
