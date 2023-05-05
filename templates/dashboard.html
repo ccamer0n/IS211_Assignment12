@@ -6,21 +6,27 @@
 </head>
     <h1>Dashboard</h1>
 <body>
+    <h2>Students</h2>
     <table border = 1>
         <tr>
             <th>Student ID</th>
             <th>First Name</th>
             <th>Last Name</th>
+            <th>Delete?</th>
         </tr>
         {% for row in students %}
         <tr>
-            {% for field in row %}
-            <td>{{ field }}</td>
-            {% endfor %}
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td><a href="/student/delete/{{ row[0] }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
     <br>
+    <a href="/student/add">Add student</a>
+    <br><br>
+    <h2>Quizzes</h2>
     <table border = 1>
         <tr>
             <th>Quiz ID</th>
@@ -30,15 +36,15 @@
         </tr>
         {% for row in quizzes %}
         <tr>
-            {% for field in row %}
-            <td>{{ field }}</td>
-            {% endfor %}
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+            <td><a href="/student/{{ row[0] }}">Click to view results</a></td>
         </tr>
         {% endfor %}
     </table>
     <br>
-    <a href="/student">Add student</ahref>
-    <br>
-    <a href="/quizzes">Add quiz</ahref>
+    <a href="/quizzes/add">Add quiz</a>
 </body>
 </html>

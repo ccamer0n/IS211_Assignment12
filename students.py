@@ -2,73 +2,81 @@ from flask import Flask, render_template, request, redirect
 import sqlite3
 app = Flask(__name__)
 
-credentials = {'admin': 'password'}
+CREDENTIALS = {'admin': 'password'}
 
 @app.route('/')
 def home():
     return render_template('login.html')
 
-@app.route('/login', methods = ['POST'])
+@app.route('/login', methods = ['POST', 'GET'])
 def login():
-    try:
-        if request.form['password'] == credentials[request.form['username']]:
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username in CREDENTIALS and password == CREDENTIALS[username]:
             return redirect('/dashboard')
         else:
-            error = "Invalid password"
+            error = "Invalid username or password"
             return render_template('login.html', error=error)
-    except:
-        error = "Invalid username"
-        return render_template('login.html', error=error)
-
+    else:
+        return render_template('login.html', error=None)
 @app.route('/dashboard')
 def dashboard():
     with sqlite3.connect('hw13.db') as con:
         cur = con.cursor()
-        cur.execute("SELECT * FROM Students")
+        cur.execute("SELECT id, first_name, last_name FROM Students")
         students = cur.fetchall()
         cur.execute("SELECT * FROM Quizzes")
         quizzes = cur.fetchall()
 
     return render_template('dashboard.html', students=students, quizzes=quizzes)
 
-@app.route('/student')
-def student_form():
-    return render_template('addStudentPage.html')
-
-@app.route('/student/add', methods = ['POST'])
+@app.route('/student/add', methods = ['POST', 'GET'])
 def add_student():
-    try:
+    if request.method == 'POST':
         first_name = request.form['first_name']
         last_name = request.form['last_name']
-        with sqlite3.connect('hw13.db') as con:
-            cur = con.cursor()
-            cur.execute("INSERT INTO Students (first_name, last_name) VALUES (?, ?)", (first_name, last_name))
-            con.commit()
-            return redirect('/dashboard')
-    except:
-        con.rollback()
-        error = "Error in insert operation"
-        return render_template('addStudentPage.html', error=error)
+        if first_name and last_name:
+            with sqlite3.connect('hw13.db') as con:
+                cur = con.cursor()
+                cur.execute("INSERT INTO Students (first_name, last_name) VALUES (?, ?)", (first_name, last_name))
+                con.commit()
+                return redirect('/dashboard')
+        else:
+            error = "Please check that all fields are filled out before submitting"
+            return render_template('addStudentPage.html', error=error)
+    else:
+        return render_template('addStudentPage.html')
 
-@app.route('/quizzes')
-def quizzes_form():
-    return render_template('addQuizPage.html')
+@app.route('/student/delete/<student_id>')
+def delete_student(student_id=None):
+    return student_id
 
-@app.route('/quizzes/add', methods = ['POST'])
+@app.route('/quizzes/add', methods = ['POST', 'GET'])
 def add_quizzes():
-    try:
+    if request.method == 'POST':
         subject = request.form['subject']
         num_questions = request.form['num_questions']
         date = request.form['date']
-        with sqlite3.connect('hw13.db') as con:
-            cur = con.cursor()
-            cur.execute("INSERT INTO Quizzes (subject, num_questions, date) VALUES (?, ?, ?)", (subject, num_questions, date))
-            con.commit()
-            return redirect('/dashboard')
-    except:
-        con.rollback()
-        error = "Error in insert operation"
-        return render_template('addQuizPage.html', error=error)
+        if subject and num_questions and date:
+            with sqlite3.connect('hw13.db') as con:
+                cur = con.cursor()
+                cur.execute("INSERT INTO Quizzes (subject, num_questions, date) VALUES (?, ?, ?)", (subject, num_questions, date))
+                con.commit()
+                return redirect('/dashboard')
+        else:
+            error = "Please check that all fields are filled out before submitting"
+            return render_template('addQuizPage.html', error=error)
+    else:
+        return render_template('addQuizPage.html')
+
+@app.route('/student/<id>')
+def view_results(id):
+    return id
+
+@app.route('/results/add')
+def add_quiz_result():
+    pass
 
 def read_data():
     f = open('schema.sql', 'r')
