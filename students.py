@@ -1,8 +1,14 @@
+import conda.exceptions
 from flask import Flask, render_template, request, redirect
 import sqlite3
 app = Flask(__name__)
 
 CREDENTIALS = {'admin': 'password'}
+
+def get_db_connection():
+    con = sqlite3.connect('hw13.db')
+    con.row_factory = sqlite3.Row
+    return con
 
 @app.route('/')
 def home():
@@ -22,13 +28,9 @@ def login():
         return render_template('login.html', error=None)
 @app.route('/dashboard')
 def dashboard():
-    with sqlite3.connect('hw13.db') as con:
-        cur = con.cursor()
-        cur.execute("SELECT id, first_name, last_name FROM Students")
-        students = cur.fetchall()
-        cur.execute("SELECT * FROM Quizzes")
-        quizzes = cur.fetchall()
-
+    con = get_db_connection()
+    students = con.execute("SELECT id, first_name, last_name FROM Students")
+    quizzes = con.execute("SELECT * FROM Quizzes")
     return render_template('dashboard.html', students=students, quizzes=quizzes)
 
 @app.route('/student/add', methods = ['POST', 'GET'])
@@ -48,9 +50,9 @@ def add_student():
     else:
         return render_template('addStudentPage.html')
 
-@app.route('/student/delete/<student_id>')
-def delete_student(student_id=None):
-    return student_id
+@app.route('/student/delete/<id>')
+def delete_student(id=None):
+    return id
 
 @app.route('/quizzes/add', methods = ['POST', 'GET'])
 def add_quizzes():
@@ -72,11 +74,29 @@ def add_quizzes():
 
 @app.route('/student/<id>')
 def view_results(id):
-    return id
+    con = get_db_connection()
+    results = con.execute('''SELECT Results.quiz_id, Results.score, Students.id, Quizzes.id FROM Results
+    INNER JOIN Students ON Students.id = Results.Student_id 
+    INNER JOIN Quizzes ON Quizzes.id = Results.quiz_id WHERE Students.id = ?''', (id))
+    student = con.execute("SELECT first_name, last_name FROM Students WHERE id = ?", (id))
+    return render_template('quizResults.html', student=student, results=results)
 
-@app.route('/results/add')
+@app.route('/results/add', methods=['POST', 'GET'])
 def add_quiz_result():
-    pass
+    con = get_db_connection()
+    student_id = con.execute("SELECT id FROM Students")
+    quiz_id = con.execute("SELECT id FROM quizzes")
+    if request.method == 'POST':
+        student = request.form['student']
+        quiz = request.form['quiz']
+        grade = request.form['grade']
+        cur = con.cursor()
+#        cur.execute("UPDATE Results SET score = ? WHERE (student_id = ? AND quiz_id = ?)", (grade, student, quiz))
+        cur.execute("INSERT INTO Results (student_id, quiz_id, score) VALUES (?, ?, ?)", (grade, student, quiz))
+        con.commit()
+        return redirect('/dashboard')
+    else:
+        return render_template('enterScore.html', student_id=student_id, quiz_id=quiz_id)
 
 def read_data():
     f = open('schema.sql', 'r')
@@ -99,4 +119,4 @@ def init_db():
 
 if __name__ == "__main__":
     init_db()
-    app.run()
+    app.run(debug=True)

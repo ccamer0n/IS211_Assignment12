@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Results</title>
+</head>
+    <h1>Quiz Results for {{ student }}</h1>
+<body>
+    <table border = 1>
+        <tr>
+            <th>Quiz ID</th>
+            <th>Score</th>
+        </tr>
+        {% for row in results %}
+            <tr>
+                <td>{{ row['quiz_id'] }}</td>
+                <td>{{ row['score'] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <a href="/dashboard">Return to dashboard</a>
+</body>
+</html>

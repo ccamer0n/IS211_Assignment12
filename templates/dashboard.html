@@ -12,14 +12,16 @@
             <th>Student ID</th>
             <th>First Name</th>
             <th>Last Name</th>
+            <th>View Quiz Results</th>
             <th>Delete?</th>
         </tr>
         {% for row in students %}
         <tr>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[2] }}</td>
-            <td><a href="/student/delete/{{ row[0] }}">Delete</a></td>
+            <td>{{ row['id'] }}</td>
+            <td>{{ row['first_name'] }}</td>
+            <td>{{ row['last_name'] }}</td>
+            <td><a href="/student/{{ row['id'] }}">View</a></td>
+            <td><a href="/student/delete/{{ row['id'] }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
@@ -36,15 +38,15 @@
         </tr>
         {% for row in quizzes %}
         <tr>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[2] }}</td>
-            <td>{{ row[3] }}</td>
-            <td><a href="/student/{{ row[0] }}">Click to view results</a></td>
+            <td>{{ row['id'] }}</td>
+            <td>{{ row['subject'] }}</td>
+            <td>{{ row['num_questions'] }}</td>
+            <td>{{ row['date'] }}</td>
         </tr>
         {% endfor %}
     </table>
     <br>
     <a href="/quizzes/add">Add quiz</a>
+    <a href="/results/add">Add quiz result</a>
 </body>
 </html>
